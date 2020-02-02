@@ -158,9 +158,9 @@ def key_sequence_generator(length_of_text, key_numbers):
 
 def encrypt(text_numbers, key_sequence):
     encrypted_numbers = []
-    count_of_symbols = 32
+    mod = 32
     for i in range(0, len(text_numbers)):
-        encrypted_numbers.append((text_numbers[i] + key_sequence[i]) % count_of_symbols)
+        encrypted_numbers.append((text_numbers[i] + key_sequence[i]) % mod)
     return encrypted_numbers
 
 def mod_sub(a, b, mod):
