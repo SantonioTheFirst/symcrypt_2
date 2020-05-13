@@ -1,6 +1,5 @@
-file = open('text', 'r')
-string = file.read()
-file.close()
+import re
+from datetime import datetime
 
 def remove_symbols(string):
     remove_symbols = [',', '.', '!', '\"', '-', ' ', ';', ':', '?', '–']
@@ -84,6 +83,8 @@ def text_to_numbers(string):
         elif string[i] == 'я':
             numbers.append(30)
         elif string[i] == ' ':
+            numbers.append(31)
+        else:
             numbers.append(31)
     return numbers
 
@@ -193,11 +194,11 @@ def decrypt(text_numbers, key_sequence):
 
 def calculate_Dr(encrypted_text):
     Dr_array = []
-    for r in range(2,50):
+    for r in range(2, 100):
         if r >= len(encrypted_text):
             break
         temp = 0
-        for i in range(0,len(encrypted_text)-r):
+        for i in range(0,len(encrypted_text) - r):
             if encrypted_text[i] == encrypted_text[i + r]:
                 temp += 1
         Dr_array.append(temp)
@@ -245,28 +246,100 @@ def crack(encrypted_text_numbers, probabilities):
         # print(key)
     return key
 
-string = string.lower()
-string.replace('\n', ' ')
-string.replace('\0', ' ')
-text_numbers = text_to_numbers(string)
-key_string = 'кавалеристы спешились'
-key_numbers = text_to_numbers(key_string)
-length_of_text = len(text_numbers)
-key_sequence = key_sequence_generator(length_of_text, key_numbers)
-encrypted_numbers = encrypt(text_numbers, key_sequence)
-encrypted_text = numbers_to_text(encrypted_numbers)
-# print(encrypted_text)
-# encrypted_numbers1 = text_to_numbers(encrypted_text)
-# decrypted_numbers = decrypt(encrypted_numbers1, key_sequence)
-# text = numbers_to_text(decrypted_numbers)
-# print(text)
-calculate_Dr(encrypted_numbers)
-print(numbers_to_text(crack(encrypted_numbers, probabilities)))
+def out(string):
+    file = open('result.txt', 'w')
+    file.write(string)
+    file.close()
 
-#
-# file = open('crack_it', 'r')
-# crack_it = file.read()
-# file.close()
-# crack_in_numbers = text_to_numbers(crack_it)
-# calculate_Dr(crack_in_numbers)
-# print(numbers_to_text(crack(crack_in_numbers, probabilities)))
+what_to_do_flag = int(input('Введите 1 для шифровки, 2 для расшифровки, 3 для криптоанализа: '))
+if what_to_do_flag == 1:
+    encrypt_flag = int(input('Введите 1 для ввода открытого текста с клавиатуры, 2 для ввода из text.txt: '))
+    if encrypt_flag == 1:
+        string = str(input('Введите текст: '))
+    elif encrypt_flag == 2:
+        file = open('text.txt', 'r')
+        string = file.read()
+        file.close()
+    file = open('key.txt', 'r')
+    key_string = file.read()
+    file.close()
+    key_string = key_string.lower()
+    look_for = r"\w+"
+    allresults = re.findall(look_for, key_string)
+    res_key =''
+    for i in range(0, len(allresults)):
+        if i == len(allresults) - 1:
+            res_key += allresults[i]
+        else:
+            res_key += allresults[i] + ' '
+    key_numbers = text_to_numbers(res_key)
+    string = string.lower()
+    string.replace('\n', ' ')
+    string.replace('\0', ' ')
+    start = datetime.now()
+    text_numbers = text_to_numbers(string)
+    print(datetime.now() - start, 'text to numbers')
+    length_of_text = len(text_numbers)
+    key_sequence = key_sequence_generator(length_of_text, key_numbers)
+    encrypted_numbers = encrypt(text_numbers, key_sequence)
+    encrypted_text = numbers_to_text(encrypted_numbers)
+    out_flag = int(input('Введите 1 для вывода в консоль, 2 для вывода в result.txt: '))
+    if out_flag == 1:
+        print(encrypted_text)
+    elif out_flag == 2:
+        out(encrypted_text)
+
+if what_to_do_flag == 2:
+    decrypt_flag = int(input('Введите 1 для ввода шифр текста с клавиатуры, 2 для ввода из text.txt: '))
+    if decrypt_flag == 1:
+        string = str(input('Введите текст: '))
+    elif decrypt_flag == 2:
+        file = open('text.txt', 'r')
+        string = file.read()
+        file.close()
+    file = open('key.txt', 'r')
+    key_string = file.read()
+    file.close()
+    key_string = key_string.lower()
+    look_for = r"\w+"
+    allresults = re.findall(look_for, key_string)
+    res_key =''
+    for i in range(0, len(allresults)):
+        if i == len(allresults) - 1:
+            res_key += allresults[i]
+        else:
+            res_key += allresults[i] + ' '
+    key_numbers = text_to_numbers(res_key)
+    string = string.lower()
+    string.replace('\n', ' ')
+    string.replace('\0', ' ')
+    text_numbers = text_to_numbers(string)
+    length_of_text = len(text_numbers)
+    key_sequence = key_sequence_generator(length_of_text, key_numbers)
+    decrypted_numbers = decrypt(text_numbers, key_sequence)
+    decrypted_text = numbers_to_text(decrypted_numbers)
+    out_flag = int(input('Введите 1 для вывода в консоль, 2 для вывода в result.txt: '))
+    if out_flag == 1:
+        print(decrypted_text)
+    elif out_flag == 2:
+        out(decrypted_text)
+
+elif what_to_do_flag == 3:
+    crack_flag = int(input('Введите 1 для ввода шифр текста с клавиатуры, 2 для ввода из crack_it.txt (мин. длина текста ~120 симв.): '))
+    if crack_flag == 1:
+        string = str(input('Введите текст: '))
+    elif crack_flag == 2:
+        file = open('crack_it.txt', 'r')
+        string = file.read()
+        file.close()
+    string = string.lower()
+    string.replace('\n', ' ')
+    string.replace('\0', ' ')
+    encrypted_numbers = text_to_numbers(string)
+    calculate_Dr(encrypted_numbers)
+    key = numbers_to_text(crack(encrypted_numbers, probabilities))
+    out_flag = int(input('Введите 1 для вывода в консоль, 2 для вывода в result.txt: '))
+    if out_flag == 1:
+        print(key)
+    elif out_flag == 2:
+        out(key)

@@ -1,10 +1,7 @@
-crack_it
-text
-hack.py
-hacking.py
+*.txt
 # Prerequisites
 *.d
-
+test.py
 # Compiled Object files
 *.slo
 *.lo
